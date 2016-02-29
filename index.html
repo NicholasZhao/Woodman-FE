@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>xiaomu.ren</title>
+
+    <style type="text/css">
+      div#category { color: blue;display: inline }
+      div#pattern { color: red;display: inline }
+    </style>
+
+    <script src="js/three.min.js"></script>
+    <script src="js/jquery-1.9.1.js"></script>
+  </head>
+  <body>
+    <div id="category"></div>
+    <div id="pattern"></div>
+
+    <script type="text/javascript">
+      var categories = ["images/icon-info.png","images/icon-info.png","images/icon-info.png"];
+      var styles = [
+        ["images/icon-info.png","images/icon-info.png"],
+        ["images/icon-info.png","images/icon-info.png","images/icon-info.png"],
+        ["images/icon-info.png","images/icon-info.png","images/icon-info.png","images/icon-info.png"]
+      ];
+
+
+      function initCategory(){
+        $.each(categories, function(i, val){   
+          $("#category").append("<a href='javascript:selectCategory(" + i + ")'><img src='" + val + "' /></a>");
+        });
+      }
+      initCategory();
+
+      function selectCategory(i) {
+        $("#pattern").empty();
+        $.each(styles[i], function(j, val){
+          $("#pattern").append("<a href='javascript:selectStyle(" + j + ")'><img src='" + val + "' /></a>");
+        });
+      }
+    </script>
+  </body>
+</html>
