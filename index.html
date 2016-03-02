@@ -5,18 +5,95 @@
     <title>xiaomu.ren</title>
 
     <style type="text/css">
-      div#category { color: blue;display: inline }
-      div#pattern { color: red;display: inline }
+      div#container {
+        height: 200px;
+      }
+
+      div#pattern {  
+        width: 400px; 
+        white-space: nowrap; 
+        overflow-x:scroll; 
+      }
     </style>
 
     <script src="js/three.min.js"></script>
     <script src="js/jquery-1.9.1.js"></script>
+    <script src="js/Detector.js"></script>
+    <script src="js/ColladaLoader.js"></script>
+    <script src="js/stats.min.js"></script>
   </head>
   <body>
+    <div id="container"></div>
+
     <div id="category"></div>
     <div id="pattern"></div>
 
     <script type="text/javascript">
+      <!-- threejs start -->
+      if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+      var container, stats;
+      var camera, scene, renderer;
+      var clock = new THREE.Clock();
+      var loader = new THREE.ColladaLoader();
+
+      init();
+
+      function init() {
+
+        container = document.getElementById( 'container' );
+
+        camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera.position.set( -5, -5, 5 );
+        camera.up.set( 0, 0, 1 );
+
+        scene = new THREE.Scene();
+
+        var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+        light.position.set( 0, -4, -4 ).normalize();
+        scene.add( light );
+
+        renderer = new THREE.WebGLRenderer( { antialias: true } );
+        renderer.setClearColor( 0xfff4e5 );
+        //renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize(200, 200);
+        renderer.sortObjects = false;
+
+        container.appendChild( renderer.domElement );
+
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        container.appendChild( stats.domElement );
+        
+
+      }
+
+      function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+      }
+
+      function animate() {
+
+        requestAnimationFrame( animate, renderer.domElement );
+
+        THREE.AnimationHandler.update( clock.getDelta() );
+
+        renderer.render( scene, camera );
+
+        stats.update();
+
+      }
+
+      <!-- threejs end -->
+
+
+
       var categories = ["images/icon-info.png","images/icon-info.png","images/icon-info.png"];
       var styles = [
         ["images/icon-info.png","images/icon-info.png"],
@@ -38,6 +115,34 @@
           $("#pattern").append("<a href='javascript:selectStyle(" + j + ")'><img src='" + val + "' /></a>");
         });
       }
+
+      function selectStyle(i) {
+        loader.load( "./models/chaji.dae", function ( collada ) {
+        
+          collada.scene.traverse( function ( child ) {
+
+            if ( child instanceof THREE.SkinnedMesh ) {
+
+              var animation = new THREE.Animation( child, child.geometry.animation );
+              animation.play();
+
+              camera.lookAt( child.position );
+
+            }
+
+          } );
+
+          scene.add( collada.scene );
+
+        } );
+
+        window.addEventListener( 'resize', onWindowResize, false );
+
+        animate();
+      }
+
+
+
     </script>
   </body>
 </html>
